@@ -8,3 +8,5 @@ branches:
   - label: question
     skip: true
     
+openDraftPR: true
+conventionalPrTitles: true

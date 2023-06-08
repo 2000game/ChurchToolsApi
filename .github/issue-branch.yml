@@ -1,5 +1,5 @@
 branches:
-  - labels: bug
+  - label: bug
     prefix: bugfix/
   - label: enhancement
     prefix: feature/

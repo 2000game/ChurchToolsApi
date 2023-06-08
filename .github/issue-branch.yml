@@ -10,3 +10,4 @@ branches:
     
 openDraftPR: true
 conventionalPrTitles: true
+autoCloseIssue: true

@@ -1,0 +1,10 @@
+branches:
+  - labels: bug
+    prefix: bugfix/
+  - label: enhancement
+    prefix: feature/
+  - label: github_actions
+    prefix: github_actions/
+  - label: question
+    skip: true
+    

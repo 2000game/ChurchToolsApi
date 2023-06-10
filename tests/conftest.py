@@ -12,6 +12,12 @@ from __future__ import annotations
 
 from typing import List
 
+from ChurchToolsApi.churchtools_api import ExternalCommunicator
+from ChurchToolsApi.churchtools_api import ChurchToolsApi
+import logging
+import pytest
+import requests
+
 import pytest
 from _pytest.nodes import Item
 
@@ -28,3 +34,37 @@ def pytest_collection_modifyitems(items: list[Item]):
 def unit_test_mocks(monkeypatch: None):
     """Include Mocks here to execute all commands offline and fast."""
     pass
+
+
+# Make a mock fixture that build a request response object with modifiable functions
+# https://stackoverflow.com/questions/15753390/how-can-i-mock-requests-and-the-response
+
+
+class MockResponse:
+    def __init__(self, json_data: dict, status_code: int, url: str = "https://demo.church.tools/api/whoami"):
+        self.json_data = json_data
+        self.status_code = status_code
+        self.url = url
+
+    def json(self):
+        return self.json_data
+
+    def change_json(self, json_data: dict):
+        self.json_data = json_data
+
+    def change_status_code(self, status_code: int):
+        self.status_code = status_code
+
+    def change_url(self, url: str):
+        self.url = url
+
+
+def mock_session_get(*args, **kwargs):
+    response = MockResponse({"id": 1}, 200)
+    return response
+
+
+@pytest.fixture(autouse=True)
+def class_constructor(monkeypatch):
+    monkeypatch.setattr(requests.Session, "get", mock_session_get)
+    return ChurchToolsApi("https://demo.church.tools", "token")

@@ -7,7 +7,19 @@
 from __future__ import annotations
 
 import requests
-from ChurchToolsApi.exceptions import ChurchToolsApiConnectionException
+from ChurchToolsApi.exceptions import (
+    ChurchToolsApiConnectionException,
+    ChurchToolsApiNotFoundException,
+    ChurchToolsApiAuthenticationException,
+)
+
+
+class ExternalCommunicator:
+    def __init__(self) -> None:
+        pass
+
+    def external_authenticate(self) -> str:
+        return "Authenticated via authenticate function"
 
 
 class ChurchToolsApi:
@@ -34,14 +46,19 @@ class ChurchToolsApi:
             self.session = requests.Session()
         self.session.headers.update({"Authorization": f"Login {self.token}"})
 
+        # Check if the inputs are valid
+
         try:
             response = self.session.get(f"{self.url}/api/whoami")
         except requests.exceptions.ConnectionError as exc:
-            raise ChurchToolsApiConnectionException("Could not connect to the church tools instance.") from exc
+            raise ChurchToolsApiNotFoundException("Could not connect to the church tools instance.") from exc
+
+        if response.status_code == 401:
+            raise ChurchToolsApiAuthenticationException("Could not authenticate with the given token.")
 
         if response.status_code != 200:
             raise ChurchToolsApiConnectionException("Could not connect to the church tools instance.")
 
         if response.url != f"{self.url}/api/whoami":
             # This happens when the prefix of the church.tools url is wrong
-            raise ChurchToolsApiConnectionException("Could not connect to the church tools instance.")
+            raise ChurchToolsApiNotFoundException("Could not connect to the church tools instance.")

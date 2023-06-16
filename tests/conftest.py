@@ -17,8 +17,6 @@ from ChurchToolsApi.churchtools_api import ChurchToolsApi
 import logging
 import pytest
 import requests
-
-import pytest
 from _pytest.nodes import Item
 
 
@@ -34,6 +32,9 @@ def pytest_collection_modifyitems(items: list[Item]):
 def unit_test_mocks(monkeypatch: None):
     """Include Mocks here to execute all commands offline and fast."""
     pass
+
+
+DEFAULT_URL = "https://demo.church.tools"
 
 
 # Make a mock fixture that build a request response object with modifiable functions
@@ -65,6 +66,17 @@ def mock_session_get(*args, **kwargs):
 
 
 @pytest.fixture(autouse=True)
-def class_constructor(monkeypatch):
-    monkeypatch.setattr(requests.Session, "get", mock_session_get)
-    return ChurchToolsApi("https://demo.church.tools", "token")
+def api_instance():
+    instance = ChurchToolsApi(DEFAULT_URL, "token")
+    yield instance
+
+
+# @pytest.fixture(autouse=True)
+# def class_constructor(monkeypatch):
+#     monkeypatch.setattr(requests.Session, "get", mock_session_get)
+#     return ChurchToolsApi(DEFAULT_URL, "token")
+
+
+@pytest.fixture(autouse=True)
+def get_default_url():
+    yield DEFAULT_URL

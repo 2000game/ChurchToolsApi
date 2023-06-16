@@ -13,6 +13,8 @@ from ChurchToolsApi.exceptions import (
     ChurchToolsApiAuthenticationException,
 )
 
+import logging
+
 
 class ExternalCommunicator:
     def __init__(self) -> None:
@@ -25,6 +27,9 @@ class ExternalCommunicator:
 class ChurchToolsApi:
     """
     This class represents the ChurchToolsApi object.
+    Usage:
+        Instance via ChurchToolsApi(url, token)
+        Then call authenticate() to authenticate with the given credentials.
     """
 
     def __init__(self, url, token):
@@ -36,7 +41,7 @@ class ChurchToolsApi:
         self.url = url
         self.token = token
         self.session = None
-        self.authenticate()
+        self.authenticated = False
 
     def authenticate(self) -> None:
         """
@@ -50,8 +55,15 @@ class ChurchToolsApi:
 
         try:
             response = self.session.get(f"{self.url}/api/whoami")
+            logging.warning("Response: %s", response)
+            logging.warning("Response body: %s", response.json())
         except requests.exceptions.ConnectionError as exc:
-            raise ChurchToolsApiNotFoundException("Could not connect to the church tools instance.") from exc
+            logging.warning("Connection Error: %s", exc)
+            raise ChurchToolsApiConnectionException("Could not connect to the church tools instance.") from exc
+
+        if response.url != f"{self.url}/api/whoami":
+            # This happens when the prefix of the church.tools url is wrong
+            raise ChurchToolsApiConnectionException("Could not connect to the church tools instance.")
 
         if response.status_code == 401:
             raise ChurchToolsApiAuthenticationException("Could not authenticate with the given token.")
@@ -59,6 +71,4 @@ class ChurchToolsApi:
         if response.status_code != 200:
             raise ChurchToolsApiConnectionException("Could not connect to the church tools instance.")
 
-        if response.url != f"{self.url}/api/whoami":
-            # This happens when the prefix of the church.tools url is wrong
-            raise ChurchToolsApiNotFoundException("Could not connect to the church tools instance.")
+        self.authenticated = True

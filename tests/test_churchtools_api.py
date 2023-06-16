@@ -61,3 +61,12 @@ def test_successfull_authenticate(api_instance, get_default_url):
     responses.get(get_default_url + "/api/whoami", json={"id": 1})
     api_instance.authenticate()
     assert api_instance.authenticated
+
+
+@responses.activate
+def test_requires_login_decorator(api_instance, get_default_url):
+    responses.get(get_default_url + "/api/whoami", json={"id": 1})
+
+    assert api_instance.is_authenticated() is False
+    api_instance.get_master_data()
+    assert api_instance.is_authenticated() is True

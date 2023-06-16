@@ -12,7 +12,6 @@ from __future__ import annotations
 
 from typing import List
 
-from ChurchToolsApi.churchtools_api import ExternalCommunicator
 from ChurchToolsApi.churchtools_api import ChurchToolsApi
 import logging
 import pytest

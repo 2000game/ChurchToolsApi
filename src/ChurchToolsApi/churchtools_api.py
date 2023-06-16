@@ -14,14 +14,7 @@ from ChurchToolsApi.exceptions import (
 )
 
 import logging
-
-
-class ExternalCommunicator:
-    def __init__(self) -> None:
-        pass
-
-    def external_authenticate(self) -> str:
-        return "Authenticated via authenticate function"
+from urllib.parse import urlencode
 
 
 class ChurchToolsApi:
@@ -29,7 +22,6 @@ class ChurchToolsApi:
     This class represents the ChurchToolsApi object.
     Usage:
         Instance via ChurchToolsApi(url, token)
-        Then call authenticate() to authenticate with the given credentials.
     """
 
     def __init__(self, url, token):
@@ -72,3 +64,74 @@ class ChurchToolsApi:
             raise ChurchToolsApiConnectionException("Could not connect to the church tools instance.")
 
         self.authenticated = True
+
+    def is_authenticated(self) -> bool:
+        """
+        Check if the user is authenticated.
+        :return: True if authenticated, False otherwise.
+        """
+        return self.authenticated
+
+    @classmethod
+    def requires_login(cls, func) -> callable:
+        """
+        Decorator to check if the user is authenticated.
+        """
+
+        def wrapper(*args, **kwargs):
+            if not cls.is_authenticated():
+                cls.authenticate()
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    def construct_query_string(self, *args, **kwargs) -> str:
+        """
+        Construct a query string from the given arguments.
+        :param args: List of arguments
+        :param kwargs: List of keyword arguments
+        :return: Query string
+        """
+        query_params = {}
+
+        for arg in args:
+            if isinstance(arg, list):
+                query_params[arg[0]] = arg[1:]
+
+        query_params.update(kwargs)
+
+        query_string = urlencode(query_params, doseq=True)
+        return "?" + query_string
+
+    def get(self, endpoint: str, *args, **kwargs) -> dict:
+        """
+        Get a resource from the church tools instance.
+        :param endpoint: Endpoint of the resource
+        :return: JSON response
+        """
+        query_string = self.construct_query_string(*args, **kwargs)
+        response = self.session.get(f"{self.url}/api/{endpoint}{query_string}")
+        if response.status_code == 404:
+            raise ChurchToolsApiNotFoundException(f"Could not find resource {endpoint}")
+        return response.json()
+
+    @requires_login
+    def get_ressource_masterdata(self) -> dict:
+        """
+        Get the masterdata for the booking module.
+        :return: JSON response
+        """
+        return self.get("resource/masterdata")
+
+    @requires_login
+    def get_booking_info(self, resource_ids: list[int], start_date: str, end_date: str, status_ids: list[int]) -> dict:
+        """
+        Get the booking info for a given resource.
+        """
+        return self.get(
+            endpoint="bookings",
+            resource_ids=resource_ids,
+            start_date=start_date,
+            end_date=end_date,
+            status_ids=status_ids,
+        )

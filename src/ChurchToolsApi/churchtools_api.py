@@ -124,9 +124,15 @@ class ChurchToolsApi:
         return self._get("resource/masterdata")
 
     @RequiresLogin
-    def get_booking_info(self, resource_ids: list[int], start_date: str, end_date: str, status_ids: list[int]) -> dict:
+    def get_booking_info(
+        self, resource_ids: list[int], start_date: str = None, end_date: str = None, status_ids: list[int] = None
+    ) -> dict:
         """
         Get the booking info for a given resource.
+        :param resource_ids: List of resource ids eg. [1, 2, 3]
+        :param start_date: Start date of the booking in the format YYYY-MM-DD
+        :param end_date: End date of the booking in the format YYYY-MM-DD
+        :status_ids: List of status ids eg. [1, 2, 3, 99] where 1 = "waiting for approval", 2 = "approved", 3 = "rejected", 99 = "deleted"
         """
         return self._get(
             endpoint="bookings",

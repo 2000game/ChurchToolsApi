@@ -17,6 +17,19 @@ import logging
 from urllib.parse import urlencode
 
 
+class RequiresLogin:
+    def __init__(self, func) -> None:
+        self.func = func
+
+    def __get__(self, instance, owner):
+        def wrapper(*args, **kwargs):
+            if not instance.is_authenticated():
+                instance.authenticate()
+            return self.func(instance, *args, **kwargs)
+
+        return wrapper
+
+
 class ChurchToolsApi:
     """
     This class represents the ChurchToolsApi object.
@@ -72,19 +85,6 @@ class ChurchToolsApi:
         """
         return self.authenticated
 
-    @classmethod
-    def requires_login(cls, func) -> callable:
-        """
-        Decorator to check if the user is authenticated.
-        """
-
-        def wrapper(*args, **kwargs):
-            if not cls.is_authenticated():
-                cls.authenticate()
-            return func(*args, **kwargs)
-
-        return wrapper
-
     def construct_query_string(self, *args, **kwargs) -> str:
         """
         Construct a query string from the given arguments.
@@ -115,15 +115,15 @@ class ChurchToolsApi:
             raise ChurchToolsApiNotFoundException(f"Could not find resource {endpoint}")
         return response.json()
 
-    @requires_login
-    def get_ressource_masterdata(self) -> dict:
+    @RequiresLogin
+    def get_resource_masterdata(self) -> dict:
         """
         Get the masterdata for the booking module.
         :return: JSON response
         """
         return self.get("resource/masterdata")
 
-    @requires_login
+    @RequiresLogin
     def get_booking_info(self, resource_ids: list[int], start_date: str, end_date: str, status_ids: list[int]) -> dict:
         """
         Get the booking info for a given resource.

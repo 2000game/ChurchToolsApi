@@ -16,6 +16,7 @@ from ChurchToolsApi.churchtools_api import ChurchToolsApi
 import logging
 import pytest
 import requests
+import responses
 from _pytest.nodes import Item
 
 
@@ -64,18 +65,25 @@ def mock_session_get(*args, **kwargs):
     return response
 
 
-@pytest.fixture(autouse=True)
-def api_instance():
+@pytest.fixture
+def api_instance() -> ChurchToolsApi:
     instance = ChurchToolsApi(DEFAULT_URL, "token")
     yield instance
 
 
-# @pytest.fixture(autouse=True)
-# def class_constructor(monkeypatch):
-#     monkeypatch.setattr(requests.Session, "get", mock_session_get)
-#     return ChurchToolsApi(DEFAULT_URL, "token")
+@pytest.fixture
+@responses.activate
+def authenticated_api_instance(api_instance: ChurchToolsApi, get_default_url_api: str):
+    responses.get(get_default_url_api + "whoami", json={"id": 1})
+    api_instance.authenticate()
+    yield api_instance
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def get_default_url():
     yield DEFAULT_URL
+
+
+@pytest.fixture
+def get_default_url_api():
+    yield DEFAULT_URL + "/api/"

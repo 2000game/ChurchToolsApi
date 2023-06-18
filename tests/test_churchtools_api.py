@@ -29,44 +29,45 @@ def test_churchtools_api_init():
 
 
 @responses.activate
-def test_authenticate_wrong_url(api_instance, get_default_url):
-    responses.get(get_default_url + "/api/whoami", body=requests.exceptions.ConnectionError("Test"))
+def test_authenticate_wrong_url(api_instance, get_default_url_api):
+    responses.get(get_default_url_api + "whoami", body=requests.exceptions.ConnectionError("Test"))
     with pytest.raises(ChurchToolsApiConnectionException):
         api_instance.authenticate()
 
 
 @responses.activate
-def test_authenticate_wrong_url_2(api_instance, get_default_url):
-    responses.get(get_default_url + "/wrong_suburl", json="")
+def test_authenticate_wrong_url_2(api_instance, get_default_url_api):
+    responses.get(get_default_url_api + "/wrong_suburl", json="")
     with pytest.raises(ChurchToolsApiConnectionException):
         api_instance.authenticate()
 
 
 @responses.activate
-def test_authenticate_wrong_status_code(api_instance, get_default_url):
-    responses.get(get_default_url + "/api/whoami", json="", status=501)
+def test_authenticate_wrong_status_code(api_instance, get_default_url_api):
+    responses.get(get_default_url_api + "whoami", json="", status=501)
     with pytest.raises(ChurchToolsApiConnectionException):
         api_instance.authenticate()
 
 
 @responses.activate
-def test_authenticate_wrong_token(api_instance, get_default_url):
-    responses.get(get_default_url + "/api/whoami", json="", status=401)
+def test_authenticate_wrong_token(api_instance, get_default_url_api):
+    responses.get(get_default_url_api + "whoami", json="", status=401)
     with pytest.raises(ChurchToolsApiAuthenticationException):
         api_instance.authenticate()
 
 
 @responses.activate
-def test_successfull_authenticate(api_instance, get_default_url):
-    responses.get(get_default_url + "/api/whoami", json={"id": 1})
+def test_successfull_authenticate(api_instance, get_default_url_api):
+    responses.get(get_default_url_api + "whoami", json={"id": 1})
     api_instance.authenticate()
     assert api_instance.authenticated
 
 
 @responses.activate
-def test_requires_login_decorator(api_instance, get_default_url):
-    responses.get(get_default_url + "/api/whoami", json={"id": 1})
+def test_requires_login_decorator(api_instance, get_default_url_api):
+    responses.get(get_default_url_api + "whoami", json={"id": 1})
+    responses.get(get_default_url_api + "resource/masterdata", json={"id": 1})
 
     assert api_instance.is_authenticated() is False
-    api_instance.get_master_data()
+    api_instance.get_resource_masterdata()
     assert api_instance.is_authenticated() is True

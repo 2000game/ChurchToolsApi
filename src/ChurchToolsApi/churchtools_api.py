@@ -116,7 +116,7 @@ class ChurchToolsApi:
         return response.json()
 
     @RequiresLogin
-    def get_resource_masterdata(self) -> dict:
+    def get_ressource_masterdata(self) -> dict:
         """
         Get the masterdata for the booking module.
         :return: JSON response
@@ -125,7 +125,7 @@ class ChurchToolsApi:
 
     @RequiresLogin
     def get_booking_info(
-        self, resource_ids: list[int], start_date: str = None, end_date: str = None, status_ids: list[int] = None
+        self, ressource_ids: list[int], start_date: str = None, end_date: str = None, status_ids: list[int] = None
     ) -> dict:
         """
         Get the booking info for a given resource.
@@ -136,7 +136,7 @@ class ChurchToolsApi:
         """
         return self._get(
             endpoint="bookings",
-            resource_ids=resource_ids,
+            resource_ids=ressource_ids,
             start_date=start_date,
             end_date=end_date,
             status_ids=status_ids,

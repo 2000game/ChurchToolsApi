@@ -69,5 +69,5 @@ def test_requires_login_decorator(api_instance, get_default_url_api):
     responses.get(get_default_url_api + "resource/masterdata", json={"id": 1})
 
     assert api_instance.is_authenticated() is False
-    api_instance.get_resource_masterdata()
+    api_instance.get_ressource_masterdata()
     assert api_instance.is_authenticated() is True

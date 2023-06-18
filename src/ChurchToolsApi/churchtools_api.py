@@ -85,7 +85,7 @@ class ChurchToolsApi:
         """
         return self.authenticated
 
-    def construct_query_string(self, *args, **kwargs) -> str:
+    def _construct_query_string(self, *args, **kwargs) -> str:
         """
         Construct a query string from the given arguments.
         :param args: List of arguments
@@ -103,13 +103,13 @@ class ChurchToolsApi:
         query_string = urlencode(query_params, doseq=True)
         return "?" + query_string
 
-    def get(self, endpoint: str, *args, **kwargs) -> dict:
+    def _get(self, endpoint: str, *args, **kwargs) -> dict:
         """
         Get a resource from the church tools instance.
         :param endpoint: Endpoint of the resource
         :return: JSON response
         """
-        query_string = self.construct_query_string(*args, **kwargs)
+        query_string = self._construct_query_string(*args, **kwargs)
         response = self.session.get(f"{self.url}/api/{endpoint}{query_string}")
         if response.status_code == 404:
             raise ChurchToolsApiNotFoundException(f"Could not find resource {endpoint}")
@@ -121,14 +121,14 @@ class ChurchToolsApi:
         Get the masterdata for the booking module.
         :return: JSON response
         """
-        return self.get("resource/masterdata")
+        return self._get("resource/masterdata")
 
     @RequiresLogin
     def get_booking_info(self, resource_ids: list[int], start_date: str, end_date: str, status_ids: list[int]) -> dict:
         """
         Get the booking info for a given resource.
         """
-        return self.get(
+        return self._get(
             endpoint="bookings",
             resource_ids=resource_ids,
             start_date=start_date,

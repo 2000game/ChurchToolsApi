@@ -21,7 +21,7 @@ jobs:
               args: -m not integration and not gpu
             - tools: pytest
               args: -m integration
-      runs-on: ${{ matrix.os }}
+      runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v2
         - uses: Azure/login@v1.4.6
@@ -34,6 +34,7 @@ jobs:
             ${{ matrix.tools }}: true
             python_version: ${{ matrix.python_version }}
             workdir: '.'
+            args: ${{ matrix.args }}
 
 
 

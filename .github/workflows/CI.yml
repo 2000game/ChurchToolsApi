@@ -10,16 +10,31 @@ on:
 
 jobs:
   validation:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.8', '3.9', '3.10.', '3.11', 'pypy3.8']
-    steps:
-    - uses: microsoft/action-python/.github/workflows/validation.yml@0.7.0
-      with:
-        workdir: '.'
-        python-version: ${{ matrix.python-version }}
+      name: 'Code Validation'
+      runs-on: ${{ matrix.os }}
+      strategy:
+        matrix:
+          tools: ['black', 'bandit', 'pylint', 'flake8']
+          include:
+            - tools: pytest
+              args: -m not integration and not gpu
+            - tools: pytest
+              args: -m integration
+          os: [ubuntu-latest, macos-latest, windows-latest]
+          python-version: ['3.8', '3.9', '3.10.', '3.11', 'pypy3.8']
+      steps:
+        - uses: actions/checkout@v2
+        - uses: Azure/login@v1.4.6
+          continue-on-error: true
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+        - name: ${{ matrix.tools }}
+          uses: microsoft/action-python@0.6.4
+          with:
+            ${{ matrix.tools }}: true
+            python_version: ${{ matrix.python_version }}
+            workdir: '.'
+
 
   
 

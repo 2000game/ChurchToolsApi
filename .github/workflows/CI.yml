@@ -10,6 +10,7 @@ on:
 
 jobs:
   validation:
+      name: 'Code Validation'
       runs-on: ${{ matrix.os }}
       strategy:
         matrix:

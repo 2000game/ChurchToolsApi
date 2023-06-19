@@ -39,7 +39,7 @@ class ChurchToolsApi:
 
     def __init__(self, url, token):
         """
-        Initialize the ChurchToolsApi object either with a token.
+        Initialize the ChurchToolsApi object with a token.
         :param url: URL of the church tools instance
         :param token: Token for authentication
         """

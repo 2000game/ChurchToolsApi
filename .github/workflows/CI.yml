@@ -1,7 +1,7 @@
 name: Python CI
 on:
   push:
-    branches: [ main ] 
+    branches: [ main ]
   pull_request:
     branches: [ main ]
   release:
@@ -11,17 +11,17 @@ on:
 jobs:
   validation:
       name: 'Code Validation'
-      runs-on: ${{ matrix.os }}
       strategy:
         matrix:
+          os: [ubuntu-latest, macos-latest, windows-latest]
+          python-version: ['3.8', '3.9', '3.10.', '3.11', 'pypy3.8']
           tools: ['black', 'bandit', 'pylint', 'flake8']
           include:
             - tools: pytest
               args: -m not integration and not gpu
             - tools: pytest
               args: -m integration
-          os: [ubuntu-latest, macos-latest, windows-latest]
-          python-version: ['3.8', '3.9', '3.10.', '3.11', 'pypy3.8']
+      runs-on: ${{ matrix.os }}
       steps:
         - uses: actions/checkout@v2
         - uses: Azure/login@v1.4.6
@@ -36,7 +36,7 @@ jobs:
             workdir: '.'
 
 
-  
+
 
   publish:
     uses: microsoft/action-python/.github/workflows/publish.yml@0.7.0

@@ -19,10 +19,10 @@ jobs:
           include:
             - tools: pytest
               args: -m not integration and not gpu
+              python-version: 3.11
+              update-coverage: true
             - tools: pytest
               args: -m integration
-            - python-version: 3.11
-              update-coverage: true
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3

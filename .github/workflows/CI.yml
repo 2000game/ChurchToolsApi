@@ -19,15 +19,13 @@ jobs:
           include:
             - tools: pytest
               args: -m not integration and not gpu
+              python-version: 3.11
+              update-coverage: true
             - tools: pytest
               args: -m integration
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3
-        - uses: Azure/login@v1.4.7
-          continue-on-error: true
-          with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
         - name: ${{ matrix.tools }}
           uses: microsoft/action-python@0.7.0
           with:
@@ -35,6 +33,15 @@ jobs:
             python_version: ${{ matrix.python_version }}
             workdir: '.'
             args: ${{ matrix.args }}
+        - name: Upload coverage to Codecov
+          if: ${{ matrix.update-coverage }}
+          uses: codecov/codecov-action@v3
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            files: ./coverage.xml
+            fail_ci_if_error: true
+            verbose: true
+            directory: '.'
 
 
 

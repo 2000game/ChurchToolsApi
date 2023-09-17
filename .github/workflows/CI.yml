@@ -25,9 +25,9 @@ jobs:
               args: -m integration
       runs-on: ubuntu-latest
       steps:
-        - uses: actions/checkout@v3.5.3
+        - uses: actions/checkout@v4.0.0
         - name: ${{ matrix.tools }}
-          uses: microsoft/action-python@0.7.1
+          uses: microsoft/action-python@0.7.2
           with:
             ${{ matrix.tools }}: true
             python_version: ${{ matrix.python_version }}
@@ -47,7 +47,7 @@ jobs:
 
 
   publish:
-    uses: microsoft/action-python/.github/workflows/publish.yml@0.7.1
+    uses: microsoft/action-python/.github/workflows/publish.yml@0.7.2
     secrets:
       PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       TEST_PYPI_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD  }}
